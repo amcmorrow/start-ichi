@@ -129,6 +129,19 @@ def delete_item(item_id):
             return jsonify({"message": "Item deleted"})
     return jsonify({"error": "Item not found"}), 404
 
+
+@app.route("/debug-test-file")
+def debug_test_file():
+    test_path = os.path.join(app.static_folder, "test/index.html")
+    exists = os.path.exists(test_path)
+    
+    return jsonify({
+        "file_path": test_path,
+        "exists": exists,
+        "static_folder": app.static_folder,
+        "absolute_static_path": os.path.abspath(app.static_folder)
+    })
+    
 # Serve React app
 # Simplified static file serving - just one route to handle everything
 @app.route("/", defaults={"path": ""})
