@@ -141,16 +141,33 @@ def debug_test_file():
         "static_folder": app.static_folder,
         "absolute_static_path": os.path.abspath(app.static_folder)
     })
-    
+
 # Serve React app
 # Simplified static file serving - just one route to handle everything
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def serve(path):
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+    # Check if path is a directory and contains index.html
+    path_on_disk = os.path.join(app.static_folder, path)
+    
+    # If path ends with /, check for index.html in that directory
+    if path.endswith('/') or path == '':
+        index_file = os.path.join(path_on_disk, 'index.html')
+        if os.path.exists(index_file):
+            return send_from_directory(os.path.join(app.static_folder, path), 'index.html')
+    
+    # If path is a directory (but no trailing slash), check for index.html
+    elif os.path.isdir(path_on_disk):
+        index_file = os.path.join(path_on_disk, 'index.html')
+        if os.path.exists(index_file):
+            return send_from_directory(path_on_disk, 'index.html')
+    
+    # Normal file handling
+    if os.path.exists(path_on_disk) and not os.path.isdir(path_on_disk):
         return send_from_directory(app.static_folder, path)
-    else:
-        return send_from_directory(app.static_folder, "index.html")
+    
+    # Default to serving the main index.html
+    return send_from_directory(app.static_folder, "index.html")
 
 
 if __name__ == "__main__":
