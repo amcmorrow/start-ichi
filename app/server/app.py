@@ -134,10 +134,6 @@ def delete_item(item_id):
 def serve_test_index():
     return send_from_directory(app.static_folder, "test/index.html")
 
-    # Add this specific route for the /startpage/ directory
-@app.route("/startpage/")
-def serve_test_index():
-    return send_from_directory(app.static_folder, "startpage/index.html")
 
 # Serve React app
 @app.route("/", defaults={"path": ""})
