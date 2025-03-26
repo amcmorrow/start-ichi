@@ -129,46 +129,21 @@ def delete_item(item_id):
             return jsonify({"message": "Item deleted"})
     return jsonify({"error": "Item not found"}), 404
 
-
-@app.route("/debug-test-file")
-def debug_test_file():
-    test_path = os.path.join(app.static_folder, "test/index.html")
-    exists = os.path.exists(test_path)
-    
-    return jsonify({
-        "file_path": test_path,
-        "exists": exists,
-        "static_folder": app.static_folder,
-        "absolute_static_path": os.path.abspath(app.static_folder)
-    })
+# Add this specific route for the /test/ directory
+@app.route("/test/")
+def serve_test_index():
+    return send_from_directory(app.static_folder, "test/index.html")
 
 # Serve React app
-# Simplified static file serving - just one route to handle everything
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def serve(path):
-    # Check if path is a directory and contains index.html
-    path_on_disk = os.path.join(app.static_folder, path)
-    
-    # If path ends with /, check for index.html in that directory
-    if path.endswith('/') or path == '':
-        index_file = os.path.join(path_on_disk, 'index.html')
-        if os.path.exists(index_file):
-            return send_from_directory(os.path.join(app.static_folder, path), 'index.html')
-    
-    # If path is a directory (but no trailing slash), check for index.html
-    elif os.path.isdir(path_on_disk):
-        index_file = os.path.join(path_on_disk, 'index.html')
-        if os.path.exists(index_file):
-            return send_from_directory(path_on_disk, 'index.html')
-    
-    # Normal file handling
-    if os.path.exists(path_on_disk) and not os.path.isdir(path_on_disk):
+    print(f"Serving path: {path}")
+    print(f"Static folder: {app.static_folder}")
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
         return send_from_directory(app.static_folder, path)
-    
-    # Default to serving the main index.html
-    return send_from_directory(app.static_folder, "index.html")
-
+    else:
+        return send_from_directory(app.static_folder, "index.html")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True) 
