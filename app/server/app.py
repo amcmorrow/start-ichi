@@ -4,12 +4,6 @@ import os
 from flask_cors import CORS
 import requests
 
-@app.route('/subfolder/<path:subpath>')
-def proxy_subfolder(subpath):
-    target_url = f"https://dibberlab.me/{subpath}"
-    response = requests.get(target_url)
-    return response.content
-
 app = Flask(__name__, static_folder=".", static_url_path="")
 CORS(app)  # Enable CORS for all routes
 
@@ -125,6 +119,13 @@ def update_item(item_id):
             write_data(data)
             return jsonify(updated_item)
     return jsonify({"error": "Item not found"}), 404
+
+@app.route('/<path:subpath>')
+def proxy_subfolder(subpath):
+    target_url = f"https://dibberlab.me/{subpath}"
+    response = requests.get(target_url)
+    return response.content
+
 
 @app.route("/api/items/<int:item_id>", methods=["DELETE"])
 def delete_item(item_id):
