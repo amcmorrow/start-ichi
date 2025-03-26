@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, send_from_directory
 import json
 import os
 from flask_cors import CORS
-import requests
 
 app = Flask(__name__, static_folder=".", static_url_path="")
 CORS(app)  # Enable CORS for all routes
@@ -120,13 +119,6 @@ def update_item(item_id):
             return jsonify(updated_item)
     return jsonify({"error": "Item not found"}), 404
 
-@app.route('/<path:subpath>')
-def proxy_subfolder(subpath):
-    target_url = f"https://dibberlab.me/{subpath}"
-    response = requests.get(target_url)
-    return response.content
-
-
 @app.route("/api/items/<int:item_id>", methods=["DELETE"])
 def delete_item(item_id):
     data = read_data()
@@ -138,15 +130,15 @@ def delete_item(item_id):
     return jsonify({"error": "Item not found"}), 404
 
 # Serve React app
+# Simplified static file serving - just one route to handle everything
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def serve(path):
-    print(f"Serving path: {path}")
-    print(f"Static folder: {app.static_folder}")
     if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, "index.html")
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True) 
