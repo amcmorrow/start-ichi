@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy Flask app and React app
 COPY app/server ./
-COPY app/client/build ./
+COPY --from=build-frontend /app/client/build ./
 
 # Create data directory and set permissions
 RUN mkdir -p /app/data && \
