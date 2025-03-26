@@ -1,9 +1,0 @@
-
-
-## Screenshot:
-
-![screenshot](screenshot.png)
-
-
-
-
